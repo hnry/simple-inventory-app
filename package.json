@@ -1,0 +1,22 @@
+{
+  "name": "inventory",
+  "version": "0.0.1",
+  "description": "simple inventory app",
+  "main": "index.js",
+  "scripts": {
+    "test": "mocha"
+  },
+  "repository": {
+    "type": "git",
+    "url": "http://github.com"
+  },
+  "keywords": [
+    "inventory"
+  ],
+  "author": "me",
+  "license": "ISC",
+  "dependencies": {
+    "sequelize": "^3.9.0",
+    "electron-prebuilt": "*"
+  }
+}
