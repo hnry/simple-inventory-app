@@ -12,6 +12,7 @@ class EditApp extends React.Component {
     this.handleInputCustomPrice = this.handleInputCustomPrice.bind(this);
 
     this.state = {
+      category: { name: '' },
       item: {},
       stocks: [],
       // local state for this component
@@ -46,6 +47,11 @@ class EditApp extends React.Component {
               customPrice: item.defaultPrice
             }
           });
+
+          db.Category.findOne({ where: { id: item.categoryId}})
+            .then(function(category) {
+              that.setState({ category: category });
+            });
 
           db.Stock.findAll({ where: { itemId: id }})
               .then(function(results) {
@@ -195,6 +201,12 @@ class EditApp extends React.Component {
   render() {
     return (
       <div>
+      <div className='row'>
+        <div className='col-xs-12'>
+          <h3>{this.state.category.name}</h3>
+        </div>
+      </div>
+
       <div className='row'>
         <div className='col-xs-12'>
           <label>Item Name:</label>
