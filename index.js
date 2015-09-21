@@ -29,7 +29,7 @@ app.on('ready', function() {
 			editWindow = null;
   	}
   	function createEditWin() {
-		  editWindow = new BrowserWindow({ width: 355, height: 625, resizable: false });
+		  editWindow = new BrowserWindow({ width: 355, height: 680, resizable: false });
 		  editWindow.loadUrl('file://' + __dirname + '/edit.html?id=' + itemId);
 			editWindow.on('close', closeWin);
 		}

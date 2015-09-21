@@ -67,7 +67,7 @@ class EditApp extends React.Component {
     }
     let cost = this.state.item.defaultCost;
 
-    if (!cost) {
+    if (!cost && cost !== 0) {
       alert('Must have cost.');
       return;
     }
