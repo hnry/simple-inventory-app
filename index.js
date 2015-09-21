@@ -1,7 +1,10 @@
 var app = require('app');
 var BrowserWindow = require('browser-window');
+var ipc = require('ipc');
+var db = require('./src/lib/db');
 
-var mainWindow = null;
+var mainWindow = null
+	,	editWindow = null;
 
 // Quit when all windows are closed.
 app.on('window-all-closed', function() {
@@ -12,11 +15,46 @@ app.on('window-all-closed', function() {
   }
 });
 
-// This method will be called when Electron has finished
-// initialization and is ready to create browser windows.
 app.on('ready', function() {
-  // Create the browser window.
-  mainWindow = new BrowserWindow({width: 500, height: 400});
+  mainWindow = new BrowserWindow({width: 500, height: 400, resizable: false });
+  mainWindow.on('closed', function() {
+    editWindow = null;
+    mainWindow = null;
+  });
+
+  ipc.on('edit-item', function(idk, itemId) {
+  	function closeWin() {
+			editWindow = null;
+  	}
+  	function createEditWin() {
+		  editWindow = new BrowserWindow({ width: 355, height: 625, resizable: false });
+		  editWindow.loadUrl('file://' + __dirname + '/edit.html?id=' + itemId);
+			editWindow.on('close', closeWin);
+		}
+
+		if (editWindow) { 
+			editWindow.close();
+			closeWin();
+		}
+		createEditWin();
+  });
+
+  ipc.on('close-edit-win', function() {
+  	editWindow.close();
+  	editWindow = null;
+  });
+
+  ipc.on('close-create-win', function() {
+  	// 
+  });
+
+  ipc.on('create-item', function(idk) {
+  	function createCreateWin() {
+  		var createWin = new BrowserWindow({ width: 355, height: 350, resizable: false });
+  		createWin.loadUrl('file://' + __dirname + '/createItem.html');
+  	}
+  	createCreateWin();
+  });
 
   var firsttime = false;
   // TODO check if first time
@@ -24,14 +62,5 @@ app.on('ready', function() {
   if (!firsttime) loadFile = '/index.html'; 
   mainWindow.loadUrl('file://' + __dirname + loadFile);
 
-  // Open the DevTools.
-  mainWindow.openDevTools();
-
-  // Emitted when the window is closed.
-  mainWindow.on('closed', function() {
-    // Dereference the window object, usually you would store windows
-    // in an array if your app supports multi windows, this is the time
-    // when you should delete the corresponding element.
-    mainWindow = null;
-  });
+  if (process.env.NODE_ENV === 'development') mainWindow.openDevTools();
 });

@@ -1,0 +1,25 @@
+.list-item-row {
+	background-color: #FFF5EE;
+	cursor: pointer;
+	margin: 2px;
+	text-align: center;
+	padding: 2px;
+}
+
+.list-item-row:hover {
+	background-color: #FAEBD7;
+}
+
+.list-item-stock {
+	background-color: #d3d3d3;
+	padding-left: 3px;
+	padding-right: 3px;
+	border-radius: 3px;
+}
+
+.list-item-price {
+	background-color: #98fb98;
+	padding-left: 3px;
+	padding-right: 3px;
+	border-radius: 3px;
+}
