@@ -28,11 +28,20 @@ class CreateApp extends React.Component {
 
   updateCategories() {
     const that = this;
+
+    this.refreshMainWin();
+
     db.Category.all().then(function(cats) {
       that.setState({ categories: cats });
     }).catch(function(err) {
       alert('Unexpected error connecting to database, specifically fetching categories');
     });    
+  }
+
+  refreshMainWin() {
+    // tells the main window to update itself
+    // should call when we create,del,edit data
+    ipc.send('refresh');
   }
 
   closeWindow() {

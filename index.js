@@ -29,7 +29,7 @@ app.on('ready', function() {
 			editWindow = null;
   	}
   	function createEditWin() {
-		  editWindow = new BrowserWindow({ width: 355, height: 680, resizable: false });
+		  editWindow = new BrowserWindow({ width: 355, height: 685, resizable: false });
 		  editWindow.loadUrl('file://' + __dirname + '/edit.html?id=' + itemId);
 			editWindow.on('close', closeWin);
 		}
@@ -67,6 +67,10 @@ app.on('ready', function() {
   ipc.on('close-create-win', function() {
   	createWindow.close();
   	createWindow = null;
+  });
+
+  ipc.on('refresh', function() {
+  	mainWindow.webContents.send('refresh');
   });
 
   var firsttime = false;

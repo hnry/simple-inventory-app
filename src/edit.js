@@ -31,8 +31,16 @@ class EditApp extends React.Component {
     this.updateState(id);
   }
 
+  refreshMainWin() {
+    // tells the main window to update itself
+    // should call when we create,del,edit data
+    ipc.send('refresh');
+  }
+
   updateState(id) {
     id = id || this.state.id;
+    
+    this.refreshMainWin();
 
     const that = this;
     db.Item.findOne({ where: { id: id }})
@@ -50,6 +58,7 @@ class EditApp extends React.Component {
 
           db.Category.findOne({ where: { id: item.categoryId}})
             .then(function(category) {
+              if (!category) category = {name: ''};
               that.setState({ category: category });
             });
 

@@ -21,7 +21,16 @@ var App = React.createClass({
 	},
 
 	componentDidMount: function() {
-		var that = this;
+		const that = this;
+		ipc.on('refresh', function() {
+			that.updateData();
+		});
+
+		this.updateData();
+	},
+
+	updateData: function() {
+		const that = this;
 
 		db.Item.all().then(function(result) {
 			that.setState({ items: result });
