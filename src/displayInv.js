@@ -104,7 +104,7 @@ class DisplayInventory extends React.Component {
 			return false;
 		});
 
-		return items.map(item => {
+		const result = items.map(item => {
 			return (
 				<div key={item.id} onClick={this.itemClick.bind(this, item)} className={this.styles.list_item_row}>
 					<span className={'pull-left ' + this.styles.list_item_stock}>{item.stockCount}</span>
@@ -113,6 +113,13 @@ class DisplayInventory extends React.Component {
 				</div>
 			);
 		});
+
+		if (result.length) {
+			return result;
+		} else {
+			// no results to show
+			return (<div>No inventory :(</div>)
+		}
 	}
 
 	render() {

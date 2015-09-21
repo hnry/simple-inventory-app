@@ -7,3 +7,5 @@
 - support labels / tags for names for easier searching
 
 - support for outputting data into markdown format, or anything (use a templating engine)
+
+- display inventory can have 2 tabs show stock only or show all

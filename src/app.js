@@ -50,7 +50,7 @@ var App = React.createClass({
 
 			  <div className='row'>
 	        <div className='col-xs-12'>
-					  <button id='itemadd' onClick={this.handleAddClick}>Create New Item</button>
+					  <button id='itemadd' onClick={this.handleAddClick}>Create New Item / Category</button>
 				  </div>
 			  </div>
 

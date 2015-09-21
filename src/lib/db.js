@@ -55,8 +55,8 @@ exports.Stock = seq.define('stock', {
 });
 
 
-//exports.Category.hasMany(exports.Item, { as: 'Items' });
-//exports.Item.belongsTo(exports.Category);
+exports.Category.hasMany(exports.Item, { as: 'Items' });
+exports.Item.belongsTo(exports.Category);
 exports.Item.hasMany(exports.Stock, { as: 'Stocks' });
 exports.Stock.belongsTo(exports.Item);
 
