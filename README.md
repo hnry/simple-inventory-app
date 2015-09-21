@@ -1,4 +1,4 @@
-= simple inventory app =
+# simple inventory app
 
 Requires postgres
 
