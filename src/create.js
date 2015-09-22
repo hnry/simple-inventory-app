@@ -22,24 +22,52 @@ class CreateApp extends React.Component {
   }
 
   componentWillMount() {
+    const that = this;
+
+    ipc.on('categories', function(err, categories) {
+      if (!err) {
+        that.setState({ categories: categories });
+      } else {
+        alert('Unexpected error connecting to database, specifically fetching categories');       
+      }
+    });
+
+    ipc.on('category-create', function(err, category) {
+      if (!err) {
+        that.setState({ categoryName: '' });
+        that.updateCategories();
+        that.clearSelected();
+        that.refreshMainWin();
+        alert('Success! New Category saved.');
+      } else {
+        alert('Error saving new category, ' + err);
+      }
+    });
+
+    ipc.on('item-create', function(err, item) {
+      if (!err) {
+        that.setState({ name: '', defaultCost: 0, defaultPrice: 0 });
+        that.clearSelected();
+        that.refreshMainWin();
+        alert('Success! New Item saved');
+      } else {
+        alert('Error saving new item, ' + err);        
+      }
+    });
+
     this.updateCategories();
   }
 
   updateCategories() {
-    const that = this;
-
-    this.refreshMainWin();
-
-    db.Category.all().then(function(cats) {
-      that.setState({ categories: cats });
-    }).catch(function(err) {
-      alert('Unexpected error connecting to database, specifically fetching categories');
-    });    
+    ipc.send('data-request', {
+      dbName: 'Category',
+      all: true,
+      targetWindow: 'createWindow',
+      targetEvent: 'categories'
+    }); 
   }
 
   refreshMainWin() {
-    // tells the main window to update itself
-    // should call when we create,del,edit data
     ipc.send('refresh');
   }
 
@@ -83,15 +111,14 @@ class CreateApp extends React.Component {
     }
 
     const that = this;
-    db.Category.create({
-      name: this.state.categoryName
-    }).then(function(c) {
-      that.setState({ categoryName: '' });
-      that.updateCategories();
-      that.clearSelected();
-      alert('Success! New Category saved.');
-    }).catch(function(err) {
-      alert('Error saving new category, ' + err);
+    ipc.send('data-write', {
+      dbName: 'Category',
+      create: true,
+      data: {
+        name: this.state.categoryName
+      },
+      targetWindow: 'createWindow',
+      targetEvent: 'category-create'
     });
   }
 
@@ -107,17 +134,18 @@ class CreateApp extends React.Component {
     }
 
     const that = this;
-    db.Item.create({
-      categoryId: this.state.category.id,
-      name: this.state.name,
-      defaultPrice: this.state.defaultPrice,
-      defaultCost: this.state.defaultCost
-    }).then(function(item) {
-      that.setState({ name: '', defaultCost: 0, defaultPrice: 0 });
-      that.clearSelected();
-      alert('Success! New Item saved');
-    }).catch(function(err) {
-      alert('Error saving new item, ' + err);
+
+    ipc.send('data-write', {
+      dbName: 'Item',
+      create: true,
+      data: {
+        categoryId: this.state.category.id,
+        name: this.state.name,
+        defaultPrice: this.state.defaultPrice,
+        defaultCost: this.state.defaultCost        
+      },
+      targetWindow: 'createWindow',
+      targetEvent: 'item-create'
     });
   }
 
