@@ -29,3 +29,4 @@ function transform(inputPath, outputPath) {
 transform(__dirname + '/src/app.js', __dirname + '/build/app.js');
 transform(__dirname + '/src/edit.js', __dirname + '/build/edit.js');
 transform(__dirname + '/src/create.js', __dirname + '/build/create.js');
+transform(__dirname + '/src/export.js', __dirname + '/build/export.js');

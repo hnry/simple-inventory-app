@@ -58,6 +58,10 @@ var App = React.createClass({
 		ipc.send('create-item');
 	},
 
+	openExportWin: function() {
+		ipc.send('export-win');
+	},
+
 	onSearch: function(searchValue) {
 		this.setState({ search: searchValue });
 	},
@@ -73,6 +77,7 @@ var App = React.createClass({
 			  <div className='row'>
 	        <div className='col-xs-12'>
 					  <button id='itemadd' onClick={this.handleAddClick}>Create New Item / Category</button>
+  				  <button onClick={this.openExportWin}>Export Inventory</button>
 				  </div>
 			  </div>
 

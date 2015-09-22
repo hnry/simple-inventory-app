@@ -23,3 +23,8 @@
 	padding-right: 3px;
 	border-radius: 3px;
 }
+
+#export-text {
+	height: 400px;
+	width: 295px;
+}

@@ -5,7 +5,8 @@ var db = require('./src/lib/db');
 
 var mainWindow = null
 	,	createWindow = null
-	,	editWindow = null;
+	,	editWindow = null
+	,	exportWindow = null;
 
 // Quit when all windows are closed.
 app.on('window-all-closed', function() {
@@ -59,6 +60,24 @@ app.on('ready', function() {
   	createCreateWin();
   });
 
+  ipc.on('export-win', function(idk) {
+  	function closeWin() {
+  		exportWindow = null;
+  	}
+
+  	function createExportWin() {
+  		exportWindow = new BrowserWindow({ width: 325, height: 500 });
+  		exportWindow.loadUrl('file://' + __dirname + '/export.html');
+  		exportWindow.on('close', closeWin);
+  	}
+
+		if (exportWindow) { 
+			exportWindow.close();
+			closeWin();
+		}
+  	createExportWin();
+  });
+
   ipc.on('close-edit-win', function() {
   	editWindow.close();
   	editWindow = null;
@@ -67,6 +86,11 @@ app.on('ready', function() {
   ipc.on('close-create-win', function() {
   	createWindow.close();
   	createWindow = null;
+  });
+
+  ipc.on('close-export-win', function() {
+  	exportWindow.close();
+  	exportWindow = null;
   });
 
   // tell main to request / update it's data
@@ -94,8 +118,12 @@ app.on('ready', function() {
   		case 'editwindow':
   			targetWindow = editWindow;
   			break;
+   		case 'exportwindow':
+  			targetWindow = exportWindow;
+  			break;
   		case 'mainwindow':
   			targetWindow = mainWindow;
+  			break;
   	}
 
   	function successHandler(result) {
