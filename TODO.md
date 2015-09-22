@@ -9,3 +9,10 @@
 - support for outputting data into markdown format, or anything (use a templating engine)
 
 - display inventory can have 2 tabs show stock only or show all
+
+
+- Change category of an existing item
+- Add stock in item creation window
+- Make category selection in create window more visually obvious
+- Edit categorie names / tags later on...
+- search by category too

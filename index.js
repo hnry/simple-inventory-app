@@ -17,7 +17,7 @@ app.on('window-all-closed', function() {
 });
 
 app.on('ready', function() {
-  mainWindow = new BrowserWindow({width: 350, height: 400, resizable: false });
+  mainWindow = new BrowserWindow({width: 350, height: 400 });
   mainWindow.on('closed', function() {
     editWindow = null;
     createWindow = null;
@@ -29,7 +29,7 @@ app.on('ready', function() {
 			editWindow = null;
   	}
   	function createEditWin() {
-		  editWindow = new BrowserWindow({ width: 355, height: 685, resizable: false });
+		  editWindow = new BrowserWindow({ width: 375, height: 700, resizable: false });
 		  editWindow.loadUrl('file://' + __dirname + '/edit.html?id=' + itemId);
 			editWindow.on('close', closeWin);
 		}

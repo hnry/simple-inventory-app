@@ -106,7 +106,7 @@ class CreateApp extends React.Component {
 
   saveNewCategory() {
     if (!this.state.categoryName) {
-      alert('Must have a name for thew new Category');
+      alert('Must have a name for the new Category');
       return;
     }
 
@@ -179,7 +179,7 @@ class CreateApp extends React.Component {
       {/* save new category button */}
       <div className='row'>
         <div className='col-xs-12'>
-          <label for='new_category_input'>Category Name:</label>
+          <label htmlFor='new_category_input'>Category Name:</label>
           <input type='text' id='new_category_input' value={this.state.categoryName} onChange={this.handleCategoryName.bind(this)} />
           <button onClick={this.saveNewCategory.bind(this)}>Add New Category</button>
         </div>
@@ -201,17 +201,17 @@ class CreateApp extends React.Component {
       {/* Item fields */}
       <div className='row'>
         <div className='col-xs-12'>
-          <label for='create-new-item-input'>Item Name:</label>
+          <label htmlFor='create-new-item-input'>Item Name:</label>
           <br />
           <input type='text' id='create-new-item-input' value={this.state.name} onChange={this.handleItemName.bind(this)} />
           <br />
 
-          <label for='cost-new-item-input'>Item Cost:</label>
+          <label htmlFor='cost-new-item-input'>Item Cost:</label>
           <br />
           <input type='text' id='cost-new-item-input' value={this.state.defaultCost} onChange={this.handleItemCost.bind(this)} />
           <br />
 
-          <label for='price-new-item-input'>Item Sell Price:</label>
+          <label htmlFor='price-new-item-input'>Item Sell Price:</label>
           <br />
           <input type='text' id='price-new-item-input' value={this.state.defaultPrice} onChange={this.handleItemPrice.bind(this)} />
         </div>
