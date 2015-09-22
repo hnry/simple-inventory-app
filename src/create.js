@@ -1,5 +1,4 @@
 var ipc = window.require('ipc');
-var db = require('./lib/db');
 
 class CreateApp extends React.Component {
 

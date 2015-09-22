@@ -81,7 +81,7 @@ class DisplayInventory extends React.Component {
 
 		// filter for search
 		if (this.props.searchTerm) {
-			items = this.props.items.filter(item => {
+			items = items.filter(item => {
 				if (item.name.toLowerCase().indexOf(this.props.searchTerm.toLowerCase()) !== -1) {
 					return true;
 				}

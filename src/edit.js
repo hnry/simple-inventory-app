@@ -1,5 +1,4 @@
 var ipc = window.require('ipc');
-var db = require('./lib/db');
 var qs = require('querystring');
 
 class EditApp extends React.Component {
@@ -28,46 +27,63 @@ class EditApp extends React.Component {
   componentWillMount() {
     var query = document.location.href.split('?');
     var id = qs.parse(query[1]).id;
-    this.updateState(id);
+
+    const that = this;
+
+    ipc.on('category', function(err, result) {
+      if (result) that.setState({ category: result });
+    });
+
+    ipc.on('stocks', function(err, result) {
+      if (result) that.setState({ stocks: result });
+    });
+
+    ipc.on('item', function(err, item) {
+      if (!err && item) {
+        that.setState({
+          id: item.id,
+          item: item, 
+          local: {
+            name: item.name,
+            defaultCost: item.defaultCost,
+            defaultPrice: item.defaultPrice,
+            customPrice: item.defaultPrice
+          }
+        });
+
+        ipc.send('data-request', {
+          dbName: 'Category',
+          all: false,
+          dbOptions: { where: { id: item.categoryId}},
+          targetWindow: 'editWindow',
+          targetEvent: 'category'
+        });
+      }
+    });
+
+    this.updateData(id);
   }
 
   refreshMainWin() {
-    // tells the main window to update itself
-    // should call when we create,del,edit data
     ipc.send('refresh');
   }
 
-  updateState(id) {
-    id = id || this.state.id;
-    
-    this.refreshMainWin();
+  updateData(id) {
+    ipc.send('data-request', {
+      dbName: 'Item',
+      all: false,
+      dbOptions: { where: { id: id }},
+      targetWindow: 'editWindow',
+      targetEvent: 'item'
+    });
 
-    const that = this;
-    db.Item.findOne({ where: { id: id }})
-        .then(function(item) {
-          that.setState({ 
-            id: id, 
-            item: item, 
-            local: {
-              name: item.name,
-              defaultCost: item.defaultCost,
-              defaultPrice: item.defaultPrice,
-              customPrice: item.defaultPrice
-            }
-          });
-
-          db.Category.findOne({ where: { id: item.categoryId}})
-            .then(function(category) {
-              if (!category) category = {name: ''};
-              that.setState({ category: category });
-            });
-
-          db.Stock.findAll({ where: { itemId: id }})
-              .then(function(results) {
-                that.setState({ stocks: results });
-              });
-
-        });   
+    ipc.send('data-request', {
+      dbName: 'Stock',
+      all: true,
+      dbOptions: { where: { itemId: id }},
+      targetWindow: 'editWindow',
+      targetEvent: 'stocks'
+    });
   }
 
   addStock() {
@@ -280,7 +296,7 @@ class EditApp extends React.Component {
       {/* add a stock */}
       <div className='row'>
         <div className='col-xs-12'>
-          <label for=''>Cost:</label> {this.state.item.defaultCost}
+          <label>Cost:</label> {this.state.item.defaultCost}
           <br />
           <button onClick={this.addStock.bind(this)}>Add 1 Stock</button>
           <hr />

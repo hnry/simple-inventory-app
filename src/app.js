@@ -1,4 +1,3 @@
-var db = require('./lib/db');
 //var remote = require('remote');
 var ipc = window.require('ipc');
 
@@ -20,25 +19,39 @@ var App = React.createClass({
 		};
 	},
 
-	componentDidMount: function() {
-		const that = this;
-		ipc.on('refresh', function() {
-			that.updateData();
+	updateData: function() {
+		ipc.send('data-request', {
+			dbName: 'Item',
+			all: true,
+			targetWindow: 'mainWindow',
+			targetEvent: 'item-all'
 		});
 
-		this.updateData();
+		ipc.send('data-request', {
+			dbName: 'Stock',
+			all: true,
+			dbOptions: { 
+				where: { available: true } 
+			},
+			targetWindow: 'mainWindow',
+			targetEvent: 'stock-all'
+		});
 	},
 
-	updateData: function() {
+	componentDidMount: function() {
 		const that = this;
 
-		db.Item.all().then(function(result) {
+		ipc.on('item-all', function(err, result) {
 			that.setState({ items: result });
 		});
 
-		db.Stock.findAll({ where: {available: true} }).then(function(result) {
+		ipc.on('stock-all', function(err, result) {
+			if (!result) result = [];
 			that.setState({ stocks: result });
 		});
+
+		ipc.on('refresh', this.updateData);
+		this.updateData();
 	},
 
 	handleAddClick: function() {

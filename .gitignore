@@ -5,3 +5,4 @@ build/create.js
 build/edit.js
 prefill.js
 settings.json
+dist

@@ -1,17 +1,18 @@
 var settings = require('../../settings.json');
 var Seq = require('sequelize');
 
-var env = (typeof window !== 'undefined' && window.process.env) || process.env;
-if (env.NODE_ENV === 'development') {
+settings.logger = false;
+if (process.env.NODE_ENV === 'development') {
 	console.log('using development database');
-
 	settings.db_hostname = '127.0.0.1';
 	settings.db_user = 'inventorydev';
 	settings.db_password = 'inventorydev';
+	settings.logger = console.log;
 }
 
 var seq = new Seq(settings.db_name, settings.db_user, settings.db_password, {
 	host: settings.db_hostname,
+	logging: settings.logger,
 	dialect: 'postgres',
 	pool: {
 		max: 5,

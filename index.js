@@ -17,7 +17,7 @@ app.on('window-all-closed', function() {
 });
 
 app.on('ready', function() {
-  mainWindow = new BrowserWindow({width: 500, height: 400, resizable: false });
+  mainWindow = new BrowserWindow({width: 350, height: 400, resizable: false });
   mainWindow.on('closed', function() {
     editWindow = null;
     createWindow = null;
@@ -69,9 +69,94 @@ app.on('ready', function() {
   	createWindow = null;
   });
 
+  // tell main to request / update it's data
   ipc.on('refresh', function() {
   	mainWindow.webContents.send('refresh');
   });
+
+  /* 
+  	database event hooks
+  	a payload looks like this...
+  	{
+  		dbName: <the table to access>
+  		all: bool to know which operation to run on the table
+  		dbOptions: <sequelize options to be passed ({where: {id ... }})>
+			targetWindow: <a string of the variable name to send the requested data back to>
+			targetEvent: <a event string used by receiver to handle this request>
+  	}
+  */
+  ipc.on('data-request', function(event, payload) {
+  	var targetWindow = mainWindow;
+  	switch(payload.targetWindow.toLowerCase()) {
+  		case 'createwindow':
+  			targetWindow = createWindow;
+  			break;
+  		case 'editwindow':
+  			targetWindow = editWindow;
+  			break;
+  		case 'mainwindow':
+  			targetWindow = mainWindow;
+  	}
+
+  	function successHandler(result) {
+  		targetWindow.webContents.send(payload.targetEvent, null, result);
+  	}
+
+  	function errHandler(err) {
+  		targetWindow.webContents.send(payload.targetEvent,err, null);
+  	}
+
+  	if (payload.dbOptions && payload.all) {
+  		// if there's options and all, we want to findAll
+	  	payload.dbOptions.raw = true;
+  		db[payload.dbName].findAll(payload.dbOptions)
+  				.then(successHandler).catch(errHandler);
+  	} else if (payload.dbOptions && !payload.all) {
+  		// single record to look up
+	  	payload.dbOptions.raw = true;
+   		db[payload.dbName].findOne(payload.dbOptions)
+  				.then(successHandler).catch(errHandler);
+  	} else {
+   		db[payload.dbName].all({raw: true})
+  				.then(successHandler).catch(errHandler);
+  	}
+  });
+
+  /*
+  	dbName, create (bool), dbOptions, data, targetWindow, targetEvent
+   */
+  ipc.on('data-write', function(event, payload) {
+  	var targetWindow = mainWindow;
+  	switch(payload.targetWindow.toLowerCase()) {
+  		case 'createwindow':
+  			targetWindow = createWindow;
+  			break;
+  		case 'editwindow':
+  			targetWindow = editWindow;
+  			break;
+  		case 'mainwindow':
+  			targetWindow = mainWindow;
+  	}
+
+  	function successHandler(result) {
+  		targetWindow.webContents.send(payload.targetEvent, null, result);
+  	}
+
+  	function errHandler(err) {
+  		targetWindow.webContents.send(payload.targetEvent,err, null);
+  	}
+
+  	if (create) {
+  		db[payload.dbName].create(payload.data).then(successHandler).catch(errHandler);
+  	} else {
+  		db[payload.dbName].findOne(payload.dbOptions)
+  			.then(function(result) {
+  				result.updateAttributes(payload.data).then(successHandler).catch(errHandler);
+  			}).catch(errHandler);
+  	}
+  });
+
+  //////////////////////////
 
   var firsttime = false;
   // TODO check if first time
