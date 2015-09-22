@@ -61,6 +61,37 @@ class EditApp extends React.Component {
       }
     });
 
+    ipc.on('stock-create', function(err, stock) {
+      if (!err) {
+        that.updateData();
+        that.refreshMainWin();
+        alert('Successfully added 1 stock');
+      } else {
+        alert('There was an error ' + err);
+      }
+    });
+
+    ipc.on('item-update', function(err, result) {
+      if (!err) {
+        that.updateData();
+        that.refreshMainWin();
+        alert('Item details updated.');
+      } else {
+        alert('Updating item failed, with error: ' + err);
+      }
+    });
+
+    ipc.on('stock-sell', function(err, stock) {
+      if (!err) {
+        that.updateData();
+        that.refreshMainWin();
+        alert('Successfully sold 1 stock');
+      } else {
+        alert('Selling Stock error, ' + err);
+      }
+    });
+
+    // get initial data
     this.updateData(id);
   }
 
@@ -69,6 +100,8 @@ class EditApp extends React.Component {
   }
 
   updateData(id) {
+    id = id || this.state.id;
+
     ipc.send('data-request', {
       dbName: 'Item',
       all: false,
@@ -97,15 +130,15 @@ class EditApp extends React.Component {
       return;
     }
 
-    const that = this;
-    db.Stock.create({
-      itemId: this.state.id,
-      cost: cost,
-    }).then(function(stock) {
-      that.updateState();
-      alert('Successfully added 1 stock');
-    }).catch(function(err) {
-      alert('There was an error ' + err);
+    ipc.send('data-write', {
+      dbName: 'Stock',
+      create: true,
+      data: {
+        itemId: this.state.id,
+        cost: cost
+      },
+      targetWindow: 'editWindow',
+      targetEvent: 'stock-create'
     });
   }
 
@@ -119,27 +152,24 @@ class EditApp extends React.Component {
     }
 
     const that = this;
-    db.Stock.findAll({
-      where: { itemId: this.state.id , available: true },
-      order: [["stockedDate","ASC"]],
-      limit: 1
-    }).then(function(result) {
-      if (!result.length) {
-        alert('Nothing to sell');
-        return;
-      }
-      result[0].set('available', false);
-      result[0].set('soldPrice', soldPrice);
-      result[0].set('soldDate', Date.now());
-      result[0].set('note', notes);
-      result[0].save().then(function() {
-        that.updateState();
-        alert('Successfully sold 1 stock');
-      }).catch(function(err) {
-        alert('sellStock update error ' + err);
-      });
-    }).catch(function(err) {
-      alert('sellStock error ' + err);
+
+    ipc.send('data-write', {
+      dbName: 'Stock',
+      create: false,
+      all: true,
+      dbOptions: {
+        where: { itemId: this.state.id , available: true },
+        order: [["stockedDate","ASC"]],
+        limit: 1
+      },
+      data: {
+        available: false,
+        soldPrice: soldPrice,
+        soldDate: Date.now(),
+        notes: notes
+      },
+      targetWindow: 'editWindow',
+      targetEvent: 'stock-sell'
     });
   }
 
@@ -188,17 +218,17 @@ class EditApp extends React.Component {
   saveItem() {
     const that = this;
 
-    db.Item.update({
-      name: this.state.local.name,
-      defaultCost: this.state.local.defaultCost,
-      defaultPrice: this.state.local.defaultPrice
-    }, { where: { id: this.state.id }})
-    .then(function(item) {
-      // could avoid doing an additional database fetch
-      // and just use 'item' here and setState manually?
-      // TODO
-      that.updateState();
-      alert('Item details updated.');
+    ipc.send('data-write', {
+      dbName: 'Item',
+      create: false,
+      dbOptions: { where: { id: this.state.id }},
+      data: {
+        name: this.state.local.name,
+        defaultCost: this.state.local.defaultCost,
+        defaultPrice: this.state.local.defaultPrice
+      },
+      targetWindow: 'editWindow',
+      targetEvent: 'item-update'
     });
   } 
 

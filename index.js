@@ -123,7 +123,7 @@ app.on('ready', function() {
   });
 
   /*
-  	dbName, create (bool), dbOptions, data, targetWindow, targetEvent
+  	dbName, create (bool), all (bool), dbOptions, data, targetWindow, targetEvent
    */
   ipc.on('data-write', function(event, payload) {
   	var targetWindow = mainWindow;
@@ -143,16 +143,28 @@ app.on('ready', function() {
   	}
 
   	function errHandler(err) {
-  		targetWindow.webContents.send(payload.targetEvent,err, null);
+  		targetWindow.webContents.send(payload.targetEvent,err.toString(), null);
   	}
 
-  	if (create) {
+
+  	if (payload.create) {
   		db[payload.dbName].create(payload.data).then(successHandler).catch(errHandler);
   	} else {
-  		db[payload.dbName].findOne(payload.dbOptions)
-  			.then(function(result) {
-  				result.updateAttributes(payload.data).then(successHandler).catch(errHandler);
-  			}).catch(errHandler);
+  		if (payload.all) {
+	  		db[payload.dbName].findAll(payload.dbOptions)
+	  				.then(function(result) {
+	  					if (!result.length) {
+	  						errHandler('Nothing to sell.');
+	  						return;
+	  					}
+	  					result[0].updateAttributes(payload.data).then(successHandler).catch(errHandler);
+	  				}).catch(errHandler);
+  		} else {
+	  		db[payload.dbName].findOne(payload.dbOptions)
+	  			.then(function(result) {
+	  				result.updateAttributes(payload.data).then(successHandler).catch(errHandler);
+	  			}).catch(errHandler);
+  		}
   	}
   });
 
