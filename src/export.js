@@ -71,10 +71,13 @@ class Export extends React.Component {
 					}
 					return false;
 				});
+
 				let price = 'sold out';
 				if (stock.length) price = item.defaultPrice;
 
-				ret += '* ' + item.name + '    _' + price + '_ \n';
+				if (price != 'sold out') {
+					ret += '* ' + item.name + '    _' + price + '_ \n';
+				}
 			});
 
 			ret += '\n\n';
